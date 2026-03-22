@@ -23,6 +23,7 @@
 // 底盘/云台模式通道映射
 // 底盘模式: 321=逆时针小陀螺, 992=跟随模式, 1663=顺时针小陀螺
 #define RC_CH_CHASSIS_MODE 8
+#define RC_CH_AUTO_AIM 9
 
 // 摩擦轮速度档位: 321=关闭, 992=15m/s, 1663=18m/s
 #define RC_CH_FRICTION_SPEED 5

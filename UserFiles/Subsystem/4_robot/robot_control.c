@@ -1,4 +1,4 @@
-//
+﻿//
 // 整车协调控制模块实现
 // Created by pomelo on 2025/12/4
 //
@@ -7,6 +7,7 @@
 #include "IMU.h"
 #include "bsp_dwt.h"
 #include "bsp_sbus.h"
+#include "bsp_uart.h"
 #include "chassis_control.h"
 #include "chassis_imu.h"
 #include "dji_motor.h"
@@ -69,8 +70,8 @@ static NLTD_t nltd_vy;
 static NLTD_t nltd_wz;
 
 // NLTD 状态管理（防止模式切换跳变）
-static uint8_t nltd_initialized = 0;     // NLTD 是否已初始化（上电后首次）
-static uint8_t chassis_was_stopped = 1;  // 底盘是否处于停止状态（上电默认停止）
+static uint8_t nltd_initialized = 0;    // NLTD 是否已初始化（上电后首次）
+static uint8_t chassis_was_stopped = 1; // 底盘是否处于停止状态（上电默认停止）
 
 // 软停止/软启动相关
 typedef struct {
@@ -226,16 +227,23 @@ static void Read_RC_Input(void) {
   robot.rc_yaw =
       -Apply_Deadzone(SBUS_Get_Normalized_Channel(RC_CH_YAW), RC_DEADZONE);
   robot.rc_pitch =
-      Apply_Deadzone(SBUS_Get_Normalized_Channel(RC_CH_PITCH), RC_DEADZONE);
+      -Apply_Deadzone(SBUS_Get_Normalized_Channel(RC_CH_PITCH), RC_DEADZONE);
 
   // 模式判定
   // channels[8]: 321=逆时针小陀螺, 992=跟随模式, 1663=顺时针小陀螺
   uint16_t chassis_mode_ch = sbus->channels[RC_CH_CHASSIS_MODE];
+  uint16_t auto_aim_ch = sbus->channels[RC_CH_AUTO_AIM];
+
+  if (auto_aim_ch > 321) {
+    UART1_ResumeRx();
+  } else {
+    UART1_PauseRx();
+  }
 
   if (chassis_mode_ch < 650) {
     // 逆时针小陀螺
     robot.mode = ROBOT_MODE_SPIN;
-    robot.spin_speed = 4.0f;
+    robot.spin_speed = 8.0f;
   } else if (chassis_mode_ch < 1300) {
     // 跟随模式
     robot.mode = ROBOT_MODE_NORMAL;
@@ -243,7 +251,7 @@ static void Read_RC_Input(void) {
   } else {
     // 顺时针小陀螺
     robot.mode = ROBOT_MODE_SPIN;
-    robot.spin_speed = -4.0f;
+    robot.spin_speed = -8.0f;
   }
 }
 
@@ -382,7 +390,7 @@ static void Mode_No_Follow(void) {
   float vx_gimbal = robot.rc_vx * RC_VX_SENSITIVITY;
   float vy_gimbal = robot.rc_vy * RC_VY_SENSITIVITY;
 
-  float offset_rad = chassis_gimbal_offset_angle * DEG2RAD;
+  float offset_rad = -chassis_gimbal_offset_angle * DEG2RAD;
 
   // NLTD 平滑（在云台坐标系下进行）
   NLTD_Update(&nltd_vx, vx_gimbal);

@@ -22,9 +22,9 @@
 /*====================发射机构控制====================*/
 
 // 摩擦轮参数 (M3508)
-#define FRICTION_WHEEL_NUM 2     // 摩擦轮数量
-#define FRICTION_SPEED_15MS 1000 // 15m/s 弹速对应转速 (RPM)（4000）
-#define FRICTION_SPEED_18MS 4500 // 18m/s 弹速对应转速 (RPM)
+#define FRICTION_WHEEL_NUM 2                       // 摩擦轮数量
+#define FRICTION_SPEED_15MS 1000                   // 测试用
+#define FRICTION_SPEED_18MS 20000                  // 14m/s 弹速对应转速 (RPM)
 #define FRICTION_DEFAULT_SPEED FRICTION_SPEED_15MS // 默认转速
 #define FRICTION_READY_THRESHOLD 200 // 转速误差小于此值视为就绪 (RPM)
 #define FRICTION_READY_DELAY_MS 500  // 摩擦轮启动延迟 (ms)
@@ -37,8 +37,8 @@
 #define TRIGGER_SINGLE_ANGLE_DEG                                               \
   (360.0f / TRIGGER_AMMO_CAPACITY)         // 单发角度 (度)
 #define TRIGGER_SINGLE_DEADZONE_MS 150     // 单发死区时间 (ms)
-#define TRIGGER_BURST_FIRE_RATE_LOW 10.0f  // 低射频 (发/秒)
-#define TRIGGER_BURST_FIRE_RATE_HIGH 35.0f // 高射频 (发/秒)
+#define TRIGGER_BURST_FIRE_RATE_LOW 15.0f  // 低射频 (发/秒)
+#define TRIGGER_BURST_FIRE_RATE_HIGH 20.0f // 高射频 (发/秒)
 
 // 拨弹盘 PID 参数 (角度环)
 #define TRIGGER_PID_KP 4.0f

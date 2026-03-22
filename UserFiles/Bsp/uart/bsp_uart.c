@@ -5,8 +5,25 @@
 #include "bsp_uart.h"
 #include "bsp_sbus.h"
 #include "led.h"
+#include "referee_service.h"
 #include "task_user.h"
+#include <stdio.h>
+#include "vision_uart.h"
 #include <string.h>
+
+static volatile uint8_t g_uart1_rx_paused = 0;
+
+volatile uint32_t g_uart1_irq_count = 0;
+volatile uint32_t g_uart1_process_count = 0;
+volatile uint16_t g_uart1_last_size = 0;
+
+volatile uint32_t g_uart1_init_count = 0;
+volatile uint32_t g_uart1_receive_start_count = 0;
+volatile uint32_t g_uart1_rxevent_count = 0;
+volatile uint32_t g_uart1_error_count = 0;
+
+volatile uint32_t g_uart1_last_error_code = 0;
+volatile uint32_t g_uart1_last_receive_ret = 0;
 
 /** @brief 接收数据缓冲区 */
 static uint8_t receivedData_1[100];
@@ -49,6 +66,8 @@ uint8_t uart6data[100];
  * @retval 无
  */
 void UART1_Init(void) {
+  g_uart1_init_count++;
+
   // 关闭过半回调
   __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
 
@@ -84,7 +103,10 @@ void UART1_Send_IT(uint8_t *pData, uint16_t Size) {
  * @retval 无
  */
 void UART1_Receive(void) {
-  HAL_UARTEx_ReceiveToIdle_DMA(&huart1, receivedData_1, sizeof(receivedData_1));
+  if(g_uart1_rx_paused)return;
+
+  g_uart1_last_receive_ret =
+  (uint32_t)HAL_UARTEx_ReceiveToIdle_DMA(&huart1, receivedData_1, sizeof(receivedData_1));
   __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
 }
 
@@ -95,8 +117,10 @@ void UART1_Receive(void) {
  * @retval 无
  */
 void UART1_Callback(uint16_t Size) {
+  if(g_uart1_rx_paused)return;
+
   // 优先接收数据
-  memcpy(uart1data, receivedData_6, Size);
+  memcpy(uart1data, receivedData_1, Size);
   dataLength_1 = Size;
 
   // 调用用户数据处理函数
@@ -116,9 +140,11 @@ void UART1_Callback(uint16_t Size) {
 void UART1_ProcessData(uint8_t *buf, uint16_t size) {
   // 旧的键盘遥控功能已废弃，现已使用 S.BUS 遥控器
   // 保留此函数用于调试输出或其他用途
-  (void)buf;
-  (void)size;
-
+  //(void)buf;
+  //(void)size;
+  g_uart1_process_count++;
+  Vision_UART_InputBytes(buf, size);
+  
   // 现在调参已经使用调试软件修改局内变量，已废弃，仅供参考
   // 创建临时缓冲区来处理命令
   // char temp_buf[32] = {0};
@@ -181,7 +207,9 @@ void UART1_ProcessData(uint8_t *buf, uint16_t size) {
   }*/
 
   // 如果不是PID命令，保持原来的回显逻辑
-  UART1_Send_DMA(buf, size);
+
+  // 视觉串口这里先不要回显，避免干扰
+  //UART1_Send_DMA(buf, size);
 }
 
 /* ================UART6================ */
@@ -257,6 +285,7 @@ void UART6_Callback(uint16_t Size) {
  * @retval 无
  */
 void UART6_ProcessData(uint8_t *buf, uint16_t size) {
+  Referee_OnUartRx(buf, size);
   // 数据处理部分，当需要大量数据处理时，此处禁止使用阻塞
 
   // 回显数据,需要时可自行打开
@@ -275,11 +304,36 @@ void UART6_ProcessData(uint8_t *buf, uint16_t size) {
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
   // 回调的分发
   if (huart->Instance == USART1) {
+    g_uart1_rxevent_count++;
     UART1_Callback(Size);
   } else if (huart->Instance == USART6) {
-    // UART6_Callback(Size);
-    // SBUS_RxCpltCallback(huart); // 暂时征用 UART6 做 S.BUS 模拟
+    UART6_Callback(Size);
   } else if (huart->Instance == USART3) {
     SBUS_RxCpltCallback(huart, Size);
   }
+}
+
+void UART1_PauseRx(void) {
+  g_uart1_rx_paused = 1;
+
+  /* 停止当前 UART1 接收 */
+  HAL_UART_AbortReceive(&huart1);
+
+  /* 可选：清空长度，避免误用旧数据 */
+  dataLength_1 = 0;
+}
+
+void UART1_ResumeRx(void) {
+  if (!g_uart1_rx_paused) {
+    return;
+  }
+
+  g_uart1_rx_paused = 0;
+
+  /* 重新启动 UART1 接收 */
+  UART1_Receive();
+}
+
+uint8_t UART1_IsPaused(void) {
+  return g_uart1_rx_paused;
 }

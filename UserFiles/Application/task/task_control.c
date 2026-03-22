@@ -20,7 +20,13 @@
 #include "m3508_rpm.h"
 #include "robot_config.h"
 #include "robot_control.h"
+#include "referee_service.h"
 #include "task_user.h"
+#include "vision_uart.h"
+#include "bsp_uart.h"
+//#include "vision_decision.h"
+
+char buf1 [8]="testtest";
 
 #if CURRENT_BOARD_ROLE == BOARD_ROLE_GIMBAL
 #include "shoot_control.h"
@@ -39,10 +45,16 @@ extern osSemaphoreId_t controlSemHandle;
 void Control_1kHz_Task(void *argument) {
   (void)argument;
 
+  #if CURRENT_BOARD_ROLE == BOARD_ROLE_GIMBAL
+  //UART1_Init();
+  //Vision_UART_Init();
+  #endif
+
   // 等待系统初始化任务完成
   while (!g_system_init_done) {
     osDelay(1);
   }
+
 
   // LED 状态：
   // 通信正常：LED 熄灭
@@ -55,22 +67,48 @@ void Control_1kHz_Task(void *argument) {
     // 双板通信检查
     DualBoard_Comm_Update();
 
+    // 裁判系统关键字段读取（后续可直接用于功率与发弹策略）
+    {
+      const RefereeData_t *ref_data = Referee_GetData();
+      uint16_t chassis_power_limit = ref_data->game_robot_state.chassis_power_limit;
+      uint16_t buffer_energy = ref_data->power_heat_data.buffer_energy;
+      uint16_t shooter_heat = ref_data->power_heat_data.shooter_17mm_barrel_heat;
+      uint16_t projectile_allowance_17mm =
+          ref_data->projectile_allowance.projectile_allowance_17mm;
+      uint16_t remaining_gold_coin =
+          ref_data->projectile_allowance.remaining_gold_coin;
+
+      (void)chassis_power_limit;
+      (void)buffer_energy;
+      (void)shooter_heat;
+      (void)projectile_allowance_17mm;
+      (void)remaining_gold_coin;
+      (void)Referee_IsOnline();
+    }
+
 #if CURRENT_BOARD_ROLE == BOARD_ROLE_GIMBAL
     // ====================云台板控制逻辑====================
 
     // 更新底盘 IMU 数据（从 CAN 缓冲区同步）
+    
     Chassis_IMU_Update();
 
     Robot_Control_Loop();
 
     Chassis_Control_Loop();
 
+    // 视觉补偿：叠加在遥控器控制上 
+
+    //Vision_Decision_Update();
+
+    Vision_AutoAim_Apply();
+    
     GM6020_IMU_Control_Loop();
 
     Shoot_Control_Loop();
 
     CAN_Manager_SendAll();
-
+    
 #else // BOARD_ROLE_CHASSIS
     // ====================底盘板控制逻辑====================
 

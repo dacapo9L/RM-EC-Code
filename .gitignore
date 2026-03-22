@@ -1,6 +1,7 @@
 *.log
 build/
 *.sh
-Tool/
-Example/
+Tools/
+Examples/
 .idea/
+.settings/

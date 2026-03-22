@@ -15,7 +15,7 @@
 
 // 云台上电复位目标刻度 (0 ~ 8191)
 // 需要根据实际机械安装位置校准：
-#define GIMBAL_YAW_RESET_ECD 760    // Yaw 轴复位刻度
+#define GIMBAL_YAW_RESET_ECD 2400   // Yaw 轴复位刻度
 #define GIMBAL_PITCH_RESET_ECD 7681 // Pitch 轴复位刻度
 
 // 复位速度限制 (ECD/s)，越小复位越平稳
@@ -45,8 +45,8 @@
 
 // ----------------Pitch 轴参数----------------
 // 机械限位 (度)
-#define PITCH_LIMIT_MIN -29.0f
-#define PITCH_LIMIT_MAX 16.0f
+#define PITCH_LIMIT_MIN -18.0f
+#define PITCH_LIMIT_MAX 12.0f
 
 // 软限位缓冲区 (度)，接近边界时自动减速
 #define PITCH_SOFT_LIMIT_ZONE 5.0f
@@ -98,7 +98,7 @@
 // 输入: 目标角速度(deg/s), 当前角速度(deg/s)
 // 输出: 电机电压
 #define IMU_YAW_LADRC_WO 48.0
-#define IMU_YAW_LADRC_B0 0.25
+#define IMU_YAW_LADRC_B0 0.1
 #define IMU_YAW_LADRC_WC 12.0
 #define IMU_YAW_SPEED_MAX_OUT 20000.0f // 最大输出电压
 
@@ -124,7 +124,7 @@
 #define IMU_PITCH_NLTD_MAX_VEL 200.0f // 最大速度 (deg/s)
 
 // 外环 PID (角度环)
-#define IMU_PITCH_ANGLE_KP 40.0f       // 比例系数
+#define IMU_PITCH_ANGLE_KP 46.0f       // 比例系数
 #define IMU_PITCH_ANGLE_KI 100.0f      // 积分系数
 #define IMU_PITCH_ANGLE_KD 1.0f        // 微分系数
 #define IMU_PITCH_ANGLE_MAX_OUT 200.0f // 最大输出角速度 (deg/s)
@@ -132,7 +132,7 @@
 
 // 内环 LADRC (速度环)
 #define IMU_PITCH_LADRC_WO 48.00
-#define IMU_PITCH_LADRC_B0 0.5
+#define IMU_PITCH_LADRC_B0 0.3
 #define IMU_PITCH_LADRC_WC 12.00
 #define IMU_PITCH_SPEED_MAX_OUT 20000.0f // 最大输出电压
 
@@ -151,8 +151,8 @@
 
 // Pitch 轴角度限位 (IMU 坐标系下的角度)
 // 右手坐标系下低头为正抬头为负
-#define IMU_PITCH_MIN_ANGLE -29.0f // 向下最大角度
-#define IMU_PITCH_MAX_ANGLE 16.0f  // 向上最大角度
+#define IMU_PITCH_MIN_ANGLE -20.0f // 向下最大角度
+#define IMU_PITCH_MAX_ANGLE 1.0f   // 向上最大角度
 
 #endif // CURRENT_BOARD_ROLE == BOARD_ROLE_GIMBAL
 

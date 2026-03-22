@@ -33,7 +33,7 @@
 // 是否在初始化阶段等待双板通信建立：
 // 双板部署时设为 1
 // 单板调试时设为 0
-#define INIT_WAIT_DUAL_BOARD_COMM 1
+#define INIT_WAIT_DUAL_BOARD_COMM 0
 
 // 电机温度自检参数
 #define MOTOR_TEMP_MIN 5U            // 电机最低有效温度 (°C)
@@ -47,6 +47,17 @@
 #define IMU_TEMP_TIMEOUT_MS 30000U // IMU 达温等待超时 (ms)
 #define IMU_TEMP_TARGET 45.0f      // IMU 目标温度 (°C)
 #define IMU_TEMP_TOLERANCE 5.0f    // IMU 温度容差 (°C)
+
+/*====================裁判系统配置====================*/
+
+#define REF_TEAM_COLOR_RED 0
+#define REF_TEAM_COLOR_BLUE 1
+
+// 步兵编号，仅允许 3/4/5
+#define REF_INFANTRY_INDEX 3
+
+// 阵营颜色：REF_TEAM_COLOR_RED / REF_TEAM_COLOR_BLUE
+#define REF_TEAM_COLOR REF_TEAM_COLOR_RED
 
 /*====================双板通信配置====================*/
 

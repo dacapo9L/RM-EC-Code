@@ -17,8 +17,12 @@
 #include "m3508_rpm.h"
 #include "robot_config.h"
 #include "robot_control.h"
+#include "referee_service.h"
 #include "task_user.h"
 #include "temperature_IMU_pid.h"
+#include "vision_uart.h"
+//#include "vision_decision.h"
+#include "usart.h"
 
 #if CURRENT_BOARD_ROLE == BOARD_ROLE_GIMBAL
 #include "shoot_control.h"
@@ -60,7 +64,11 @@ void System_InitTask(void *argument) {
   DualBoard_Comm_Init(); // 双板通信初始化
   IMU_Init();
   UART1_Init();
+  HAL_UART_Transmit(&huart1, (uint8_t *)"U1_BOOT\r\n", 9, 100);
+  Vision_UART_Init();
+  //Vision_Decision_Init();
   UART6_Init();
+  Referee_Init();
   SBUS_Init(); // 初始化 S.BUS 接收
   LED_Init();
 

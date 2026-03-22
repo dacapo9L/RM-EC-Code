@@ -3,13 +3,50 @@
     {
       "name": "DapLink",
       "cwd": "${workspaceFolder}",
-      "executable": "build/RoboMaster_C.elf",
+      "executable": "build/Debug/RoboMaster_C.elf",
       "request": "launch",
       "type": "cortex-debug",
       "servertype": "openocd",
+      "serverpath": "E:\\edge download\\vscode_cortex_debug_example\\vscode_cortex_debug.tools\\openocd\\bin\\openocd.exe",
+      "searchDir": [
+        "E:\\edge download\\vscode_cortex_debug_example\\vscode_cortex_debug.tools\\openocd\\scripts"
+      ],
+      "gdbPath": "C:\\Users\\GK\\.vscode\\extensions\\chipcode-nl.gcc-arm-windows-1.0.1\\bin\\arm-none-eabi-gdb.exe",
       "configFiles": [
         "interface/cmsis-dap.cfg",
         "target/stm32f4x.cfg"
+      ],
+      "runToEntryPoint": "main"
+    },
+    {
+      "name": "OpenOCD Debug",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "e:\\Desk\\STM32\\RM-EC-Code\\build\\Debug\\RoboMaster_C.elf",
+      "svdPath": "",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb-multiarch",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "Set Disassembly Flavor to Intel",
+          "text": "-gdb-set disassembly-flavor intel",
+          "ignoreFailures": true
+        },
+        {
+          "description": "Set remote target to port 3333",
+          "text": "target remote :3333",
+          "ignoreFailures": false
+        }
       ]
     }
   ]
