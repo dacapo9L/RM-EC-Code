@@ -1,0 +1,14 @@
+{
+  "folders": [
+	{
+		"path": ".."
+	}
+],
+  "settings": {
+    "clangd.arguments": [
+      "--compile-commands-dir=${workspaceFolder}/build/Debug",
+      "--header-insertion=never",
+      "--query-driver=D:/STM32CubeCLT_1.18.0/GNU-tools-for-STM32/bin/arm-none-eabi-*"
+    ]
+  }
+}

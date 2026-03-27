@@ -21,7 +21,7 @@ extern CAN_HandleTypeDef hcan2;
 void USER_CAN_Filter_Init(void) {
   CAN_FilterTypeDef can_filter_st = {0};
 
-  // ========== 配置 CAN1 过滤器 ==========
+  // 配置 CAN1 过滤器
   can_filter_st.FilterActivation = ENABLE;
   can_filter_st.FilterMode = CAN_FILTERMODE_IDMASK;
   can_filter_st.FilterScale = CAN_FILTERSCALE_32BIT;
@@ -33,15 +33,14 @@ void USER_CAN_Filter_Init(void) {
   can_filter_st.FilterBank = 0;
   can_filter_st.FilterFIFOAssignment = CAN_RX_FIFO0;
 
-  // 关键：配置 CAN1 时必须指定 CAN2 的起始过滤器组
+  // 配置 CAN1 时必须指定 CAN2 的起始过滤器组
   can_filter_st.SlaveStartFilterBank = 14;
 
   HAL_CAN_ConfigFilter(&hcan1, &can_filter_st);
   HAL_CAN_Start(&hcan1);
   HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 
-  // ========== 配置 CAN2 过滤器 ==========
-  // 复用上面的配置，只修改 FilterBank
+  // 配置 CAN2 过滤器
   can_filter_st.FilterBank = 14;
 
   HAL_CAN_ConfigFilter(&hcan2, &can_filter_st);
@@ -244,7 +243,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 
   HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data);
 
-  // ========== CAN1: 电机反馈 ==========
+  // CAN1: 电机反馈
   if (hcan == &hcan1) {
     switch (rx_header.StdId) {
     case CAN_3508_M1_ID:
@@ -262,7 +261,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
       break;
     }
   }
-  // ========== CAN2: 双板通信 ==========
+  // CAN2: 双板通信
   else if (hcan == &hcan2) {
     switch (rx_header.StdId) {
     // 底盘 IMU 数据（从底盘主控板接收）

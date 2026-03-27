@@ -52,10 +52,10 @@ typedef enum {
  * 每个 CAN 消息最多 8 字节，每个电机占用 2 字节
  */
 typedef enum {
-  MOTOR_SLOT_0 = 0, // 字节 [0:1]
-  MOTOR_SLOT_1 = 1, // 字节 [2:3]
-  MOTOR_SLOT_2 = 2, // 字节 [4:5]
-  MOTOR_SLOT_3 = 3, // 字节 [6:7]
+  MOTOR_SLOT_0 = 0, // 字节 [0:1]，以此类推
+  MOTOR_SLOT_1 = 1,
+  MOTOR_SLOT_2 = 2,
+  MOTOR_SLOT_3 = 3,
 } motor_slot_e;
 
 /**

@@ -40,10 +40,10 @@ file(GLOB_RECURSE BSP_SOURCES CONFIGURE_DEPENDS
     "UserFiles/Bsp/*.cpp"
 )
 
-# Component 层
-file(GLOB_RECURSE COMPONENT_SOURCES CONFIGURE_DEPENDS
-    "UserFiles/Component/*.c"
-    "UserFiles/Component/*.cpp"
+# Devices 层
+file(GLOB_RECURSE DEVICES_SOURCES CONFIGURE_DEPENDS
+    "UserFiles/Devices/*.c"
+    "UserFiles/Devices/*.cpp"
 )
 
 # Algorithm 层
@@ -66,13 +66,13 @@ file(GLOB_RECURSE APPLICATION_SOURCES CONFIGURE_DEPENDS
 
 # 打印收集到的源文件数量（调试用）
 list(LENGTH BSP_SOURCES BSP_COUNT)
-list(LENGTH COMPONENT_SOURCES COMPONENT_COUNT)
+list(LENGTH DEVICES_SOURCES DEVICES_COUNT)
 list(LENGTH ALGORITHM_SOURCES ALGORITHM_COUNT)
 list(LENGTH SUBSYSTEM_SOURCES SUBSYSTEM_COUNT)
 list(LENGTH APPLICATION_SOURCES APPLICATION_COUNT)
 message(STATUS "Source files collected:")
 message(STATUS "  BSP:         ${BSP_COUNT} files")
-message(STATUS "  Component:   ${COMPONENT_COUNT} files")
+message(STATUS "  Devices:   ${DEVICES_COUNT} files")
 message(STATUS "  Algorithm:   ${ALGORITHM_COUNT} files")
 message(STATUS "  Subsystem:   ${SUBSYSTEM_COUNT} files")
 message(STATUS "  Application: ${APPLICATION_COUNT} files")
@@ -81,7 +81,7 @@ message(STATUS "  Application: ${APPLICATION_COUNT} files")
 
 add_executable(${CMAKE_PROJECT_NAME}
     ${BSP_SOURCES}
-    ${COMPONENT_SOURCES}
+    ${DEVICES_SOURCES}
     ${ALGORITHM_SOURCES}
     ${SUBSYSTEM_SOURCES}
     ${APPLICATION_SOURCES}
@@ -103,7 +103,7 @@ set(INCLUDE_DIRS_SET "")
 # 收集所有源文件列表
 set(ALL_USER_SOURCES
     ${BSP_SOURCES}
-    ${COMPONENT_SOURCES}
+    ${DEVICES_SOURCES}
     ${ALGORITHM_SOURCES}
     ${SUBSYSTEM_SOURCES}
     ${APPLICATION_SOURCES}
